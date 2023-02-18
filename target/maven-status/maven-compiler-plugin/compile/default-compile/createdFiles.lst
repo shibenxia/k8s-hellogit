@@ -1,0 +1,3 @@
+com\zky10\k8s\hello\controller\HelloWorldController.class
+com\zky10\k8s\hello\K8sHelloApplication.class
+com\zky10\k8s\hello\controller\DefaultController.class

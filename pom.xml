@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.12.RELEASE</version>
+    </parent>
+    <groupId>com.zky10</groupId>
+    <artifactId>k8s-hello</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>k8s-hello</name>
+    <description>k8s-hello</description>
+
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>k8s-hello</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${
+                    project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.7.6</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- https://mvnrepository.com/artifact/com.spotify/docker-maven-plugin -->
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.2.2</version>
+                <executions>
+                    <!-- 当mvn执行install操作的时候，执行docker的build和push -->
+                    <execution>
+                        <id>buildAndPush</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- 连接到 docker环境的服务器 编译image
+
+                    <dockerHost>http://192.168.10.50:2376</dockerHost>-->
+                    <dockerHost>http://app.shibenxia.com:2375</dockerHost>
+                    <!-- push到 docker hub 开始 -->
+                    <!-- serverId 这个是配置在maven的setting.xml中私服的登录账户信息-->
+                    <serverId>shibenxia-hub</serverId>
+                    <retryPushCount>1</retryPushCount>
+                    <retryPushTimeout>2000</retryPushTimeout>
+                    <registryUrl>hub.shibenxia.com</registryUrl>
+                    <!-- https://index.docker.io/v1/格式：私有仓库/镜像名称:版本号, 如果要执行push操作， 那么镜像名称必须为私有仓库为前缀，不然无效。-->
+                    <imageName>hub.shibenxia.com/yl/${project.artifactId}:2.0.0</imageName>
+
+                    <!-- push到 docker hub 结束 -->
+
+                    <!-- 指定tag版本
+                    <imageTags>
+                        <imageTag>v1.0</imageTag>/src/main/docker
+                    </imageTags>-->
+                    <dockerDirectory>${project.basedir}</dockerDirectory>
+                    <!-- optionally overwrite tags every time image is built with docker:build -->
+                    <forceTags>true</forceTags>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                            <exclude>${project.build.finalName}.jar.original</exclude>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>
